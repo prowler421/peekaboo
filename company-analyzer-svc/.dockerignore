@@ -1,0 +1,7 @@
+README.md
+taskfile.yaml
+tests/
+Dockerfile
+.direnv/
+.envrc
+.env

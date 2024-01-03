@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: 3
+
+tasks:
+  docker:lint:
+    desc: Run code quality tools on the Dockerfile
+    cmds:
+      - hadolint Dockerfile
+
+  docker:build:
+    desc: Build a docker image.
+    env:
+      DOCKER_BUILDKIT: 1
+    cmds:
+      - docker build . -t company-analyzer-svc {{.CLI_ARGS}}
+
+  docker:run:
+    desc: Run the docker image
+    cmds:
+      - docker run {{.CLI_ARGS}} -t company-analyzer-svc
+
+  poetry:lint:
+    desc: Run code quality tools for poetry project
+    cmds:
+      - poetry run black --quiet --check --diff .
+      - poetry run isort --check --diff .
+      - poetry run ruff check .
+      - poetry run pyright .
+
+  poetry:lint:fix:
+    desc: Run code quality tools for poetry project and fix
+    cmds:
+      - poetry run black --quiet --diff .
+      - poetry run isort --diff .
+      - poetry run ruff check --fix .
+      - poetry run pyright .
+
+  poetry:test:
+    desc: Run tests for the service
+    cmd: poetry run pytest
+
+  dev:
+    cmd: poetry run uvicorn company_analyzer_svc.main:app --host 0.0.0.0 --port 8000 --reload
